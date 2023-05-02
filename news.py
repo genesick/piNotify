@@ -14,6 +14,7 @@ def webscrape_news(url):
 
     # Find all the article links on the page
     article_links = soup.find_all("a", {"class": "c-teaser__link"})
+    print("hiiiii")
 
     for article_link in article_links:
         article_url = urljoin(url, article_link["href"])
