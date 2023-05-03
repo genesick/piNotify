@@ -5,9 +5,16 @@ import os
 
 class piNotifier:
     def __init__(self, message: list):
-        self.received_message = str(message)
+        
+        self.received_message = self.format_message(message)
         self.load_variables()
         
+    
+    def format_message(self, message_from_py: list) -> str:
+        formatted_message: str = ''
+        for i in range(len(message_from_py)):
+            formatted_message += message_from_py[i] + "\n"
+                    return formatted_message
     
     def load_variables(self):
         try:
@@ -19,7 +26,7 @@ class piNotifier:
         self.twilio_account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
         self.twilio_auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
         
-        self.twilio_number = os.environ.get("TWILIO_AUTH_TOKEN")
+        self.twilio_number = os.environ.get("TWILIO_NUMBER")
         self.twilio_pn = os.environ.get("TWILIO_PN")
         
         self.send_message(str(self.twilio_account_sid), str(self.twilio_auth_token))
@@ -30,7 +37,7 @@ class piNotifier:
         message = client.messages \
             .create(
             body= self.received_message,
-            from_=str(self.twilio_number),
+            from_= str(self.twilio_number),
             to=str(self.twilio_pn)
             )
 

@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta, time
 from urllib.parse import urljoin
-
+import pyshorteners
 from twiliotest import piNotifier
 
 
@@ -55,13 +55,20 @@ def webscrape_news(url):
                     if datetime.combine(datetime.min, startTime) <= datetime.combine(datetime.min, published_time) <= datetime.combine(datetime.min, endTime):
                         #print(f"Date: {publication_date} and Category: {category}, Time: {published_time}")
                         article_title = article_soup.find("h1", {"class": "c-article__heading"})
-                        summary = f"Tid: {published_time}, {article_title.text.strip()} \n"
+                        link = shorten_url(article_url)
+                        summary = f"Tid: {published_time}, {article_title.text.strip()} \nLÄNK: {link}"
                         missed_news.append(summary)
-                        print(summary)
                         continue
+    
     
     print("Finished reading everything...")
     picoNotify = piNotifier(missed_news)
+    
+def shorten_url(article_url: str) -> str:
+    shortener = pyshorteners.Shortener()
+    short_url = shortener.tinyurl.short(article_url)
+    print(short_url)
+    return str(short_url)
 
 if __name__ == "__main__":
     url = "https://www.gp.se"
