@@ -3,8 +3,11 @@ from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta, time
 from urllib.parse import urljoin
 
+from twiliotest import piNotifier
+
 
 def webscrape_news(url):
+    missed_news = list()
     today = datetime.today().date()
     yesterday = today - timedelta(days=1)
 
@@ -52,10 +55,13 @@ def webscrape_news(url):
                     if datetime.combine(datetime.min, startTime) <= datetime.combine(datetime.min, published_time) <= datetime.combine(datetime.min, endTime):
                         #print(f"Date: {publication_date} and Category: {category}, Time: {published_time}")
                         article_title = article_soup.find("h1", {"class": "c-article__heading"})
-                        print(f"Tid: {published_time}, {article_title.text.strip()}")
+                        summary = f"Tid: {published_time}, {article_title.text.strip()} \n"
+                        missed_news.append(summary)
+                        print(summary)
                         continue
-            
+    
     print("Finished reading everything...")
+    picoNotify = piNotifier(missed_news)
 
 if __name__ == "__main__":
     url = "https://www.gp.se"
