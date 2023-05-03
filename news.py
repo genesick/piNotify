@@ -38,24 +38,22 @@ def webscrape_news(url):
             hour = publication_datetime.hour
             minute = publication_datetime.minute
 
-            published_time = time(hour=int(hour), minute=minute)
+            published_time = time(hour=hour, minute=minute)
             startTime = time(hour=0, minute=0)
             endTime = time(hour=10, minute=0)
-        
 
         else:
             pass
         
         article_category = article_soup.find("span", {"class": "c-article__category"})
         #print(f"Article category: {article_category}")
-        if str(article_category) == "Göteborg" or "Världen" or "Ekonomi":
-            if str(publication_date == today or publication_date == yesterday) and startTime <= published_time <= endTime:
+        if str(article_category) == "Göteborg" or str(article_category) == "Världen" and str(publication_date) == str(yesterday):
+            if datetime.combine(datetime.min, startTime) <= datetime.combine(datetime.min, published_time) <= datetime.combine(datetime.min, endTime):
                 article_title = article_soup.find("h1", {"class": "c-article__heading"})
-                print(f"{article_title}")   
-        else:
-            continue
+                print(f"{article_title.text.strip()}")
+                continue
             
-
+    print("Finished reading everything...")
 
 if __name__ == "__main__":
     url = "https://www.gp.se"
