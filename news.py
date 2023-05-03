@@ -7,11 +7,12 @@ from urllib.parse import urljoin
 def webscrape_news(url):
     today = datetime.today().date()
     yesterday = today - timedelta(days=1)
-    
-    
+
     # Send a GET request to the URL and get the page content
     response = requests.get(url)
     content = response.content
+    
+    article_date = None
 
     # Parse the HTML content using BeautifulSoup
     soup = bs(content, "html.parser")
@@ -25,15 +26,14 @@ def webscrape_news(url):
         article_content = article_response.content
         article_soup = bs(article_content, "html.parser")
     
-        
-    
         article_time = article_soup.find("time", {"itemprop": "datePublished"})
         if article_time is not None:
-            article_time_str = article_time['datetime']
+            article_time_str:str = article_time['datetime']
             publication_datetime = datetime.strptime(article_time_str, '%Y-%m-%dT%H:%M:%SZ')
             
             # Extract time, hour, and minutes
-            publication_date = publication_datetime.strftime('%Y-%m-%d')
+            publication_date: str = publication_datetime.strftime('%Y-%m-%d')
+            article_date = datetime.strptime(publication_date, '%Y-%m-%d')
             published_time = publication_datetime.strftime('%H:%M:%S')
             hour = publication_datetime.hour
             minute = publication_datetime.minute
@@ -42,16 +42,18 @@ def webscrape_news(url):
             startTime = time(hour=0, minute=0)
             endTime = time(hour=10, minute=0)
 
-        else:
-            pass
-        
+
         article_category = article_soup.find("span", {"class": "c-article__category"})
-        #print(f"Article category: {article_category}")
-        if str(article_category) == "Göteborg" or str(article_category) == "Världen" and str(publication_date) == str(yesterday):
-            if datetime.combine(datetime.min, startTime) <= datetime.combine(datetime.min, published_time) <= datetime.combine(datetime.min, endTime):
-                article_title = article_soup.find("h1", {"class": "c-article__heading"})
-                print(f"{article_title.text.strip()}")
-                continue
+        if article_category is not None:
+            category = article_category.text.strip()
+
+            if article_date.date() == today:
+                if str(category) == "Göteborg" or str(category) == "Världen" or str(category) == "Sverige":
+                    if datetime.combine(datetime.min, startTime) <= datetime.combine(datetime.min, published_time) <= datetime.combine(datetime.min, endTime):
+                        #print(f"Date: {publication_date} and Category: {category}, Time: {published_time}")
+                        article_title = article_soup.find("h1", {"class": "c-article__heading"})
+                        print(f"Tid: {published_time}, {article_title.text.strip()}")
+                        continue
             
     print("Finished reading everything...")
 
